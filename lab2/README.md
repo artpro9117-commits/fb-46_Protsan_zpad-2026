@@ -22,12 +22,10 @@
    ```bash
    python -m venv venv
    venv\Scripts\activate
-Встановлення залежностей:
-
-Bash
-pip install -r requirements.txt
-Запуск середовища розробки:
-
-Bash
-jupyter notebook
+2. Встановлення залежностей:
+   ```bash
+   pip install -r requirements.txt
+3. Запуск середовища розробки:
+   ```bash
+   jupyter notebook
 Примітка до Частини 2: Перед запуском файлу lab2_part2.ipynb необхідно завантажити вихідний датасет з репозиторію UCI та розмістити розпакований файл household_power_consumption.txt у директорії data/.
