@@ -11,6 +11,17 @@
 * Чекбокси для перемикання видимості ліній та кнопку "Reset" для скидання параметрів.
 
 ## Інструкція з налаштування та запуску
-1. Активуйте віртуальне середовище та встановіть залежності:
-   pip install numpy matplotlib scipy ipympl jupyter
-2. Запустіть lab4.ipynb у Jupyter Notebook.
+1. Створіть віртуальне середовище:
+     ```bash
+   python -m venv venv
+   venv\Scripts\activate
+   ```
+2. Встановіть залежності:
+    ```bash
+    pip install -r requirements.txt
+    ```
+3. Запустіть Jupyter Notebook та відкрийте файл lab4.ipynb:
+    ```bash
+    jupyter notebook
+    ```
+4. Запустіть комірку з кодом у файлі. Графік з'явиться у новому вікні.
