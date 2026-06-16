@@ -2,8 +2,33 @@ import streamlit as st
 import pandas as pd
 import os
 import plotly.express as px
+import urllib.request
+import datetime
 
 st.set_page_config(layout="wide", page_title="Аналіз даних NOAA")
+
+@st.cache_data
+def ensure_vhi_data_exists(base_dir="data"):
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+
+    existing_files = os.listdir(base_dir)
+    now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    for province_id in range(1, 28):
+        file_exists = any(f.startswith(f"vhi_id_{province_id:02d}_") and f.endswith(".csv") for f in existing_files)
+        if not file_exists:
+            url = f"https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_TS_admin.php?country=UKR&provinceID={province_id}&year1=1981&year2=2024&type=Mean"
+            filename = f"vhi_id_{province_id:02d}_{now}.csv"
+            filepath = os.path.join(base_dir, filename)
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            try:
+                with urllib.request.urlopen(req) as response:
+                    data = response.read().decode('utf-8')
+                    with open(filepath, 'w') as f:
+                        f.write(data)
+            except Exception as e:
+                st.error(f"Помилка завантаження області {province_id}: {e}")
 
 @st.cache_data
 def load_data(folder_path="data"):
@@ -54,10 +79,13 @@ def load_data(folder_path="data"):
     final_df['Date'] = final_df['year'].astype(str) + " - Тиждень " + final_df['week'].astype(str)
     return final_df
 
-df = load_data()
+# Ініціалізація даних
+with st.spinner("Перевірка та завантаження даних..."):
+    ensure_vhi_data_exists()
+    df = load_data()
 
 if df.empty:
-    st.error("Дані не знайдено! Переконайтеся, що папка 'data' з CSV-файлами знаходиться поруч зі скриптом.")
+    st.error("Дані не знайдено або виникла помилка при обробці CSV-файлів.")
     st.stop()
 
 if 'resetting' not in st.session_state:
@@ -72,7 +100,6 @@ col_controls, col_content = st.columns([1, 3])
 
 with col_controls:
     st.header("Налаштування")
-    
     st.button("Скинути всі фільтри", on_click=reset_filters)
     
     metric = st.selectbox("Оберіть індекс:", ['VHI', 'VCI', 'TCI'], key='metric')
